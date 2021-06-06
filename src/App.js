@@ -98,9 +98,6 @@ class App extends Component {
     idx: 0,
   };
 
-  onClickHandler = index => {
-    this.setState({ idx: index });
-  };
   answerHandler = index => {
     const idx = this.state.idx;
     const rightAnswer = this.state.questions[this.state.idx].rightAnswer;
@@ -122,7 +119,9 @@ class App extends Component {
       console.log('score');
     }
   };
-
+  onClickHandler = index => {
+    this.setState({ idx: index });
+  };
   render() {
     return (
       <div className="app">
