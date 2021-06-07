@@ -1,10 +1,24 @@
 import React, { Component } from 'react';
-import update from 'immutability-helper';
 import Title from './Components/Title';
 import Question from './Components/Question';
 import Navigation from './Components/Navigation';
 import Answer from './Components/Answer';
 import './App.css';
+
+const ShowResult = ({ result }) => {
+  if (result < 4) {
+    return <div className="result">Поздравляю, вы баребух</div>;
+  }
+  if (result < 7) {
+    return <div className="result">Норм типок с района</div>;
+  }
+  if (result < 9) {
+    return <div className="result">Ну такое, ты анимешник штоле?</div>;
+  }
+  if (result === 11) {
+    return <div className="result">Сранный умный!</div>;
+  }
+};
 
 class App extends Component {
   state = {
@@ -13,50 +27,50 @@ class App extends Component {
         question: 'Сколько океанов на нашей планете?',
         answer: ['Три', 'Четыре', 'Пять'],
         rightAnswer: 2,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'В какой единице измеряется сила тока?',
         answer: ['Вольт', 'Ампер', 'Ватт'],
         rightAnswer: 1,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Сатурн - это какая планета по счету от солнца?',
         answer: ['Третья', 'Восьмая', 'Шестая'],
         rightAnswer: 2,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Какой элемент в таблице Менделеева носит название AG?',
         answer: ['Аргон', 'Серебро', 'Золото'],
         rightAnswer: 1,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Сколько будет 0,2 км в дециметрах?',
         answer: ['20 000 дм', '2 000 дм', '200 дм'],
         rightAnswer: 1,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Самая длинная река на планете?',
         answer: ['Амазонка', 'Нил', 'Енисей'],
         rightAnswer: 0,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Какое число обозначается римскими цифрами LXXVII?',
         answer: ['507', '5007', '77'],
         rightAnswer: 2,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'В каком предложении допущена ошибка?',
@@ -66,15 +80,15 @@ class App extends Component {
           'Эти крема просрочены',
         ],
         rightAnswer: 1,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Зеленый пигмент, окрашивающий листья растений, называется?',
         answer: ['Хлорофиллипт', 'Хлоропласт', 'Хлорофилл'],
         rightAnswer: 2,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Почему времена года сменяют друг друга?',
@@ -84,71 +98,89 @@ class App extends Component {
           'Из-за вращений Земли вокруг своей оси',
         ],
         rightAnswer: 1,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
       {
         question: 'Сколько хромосом в геноме человека?',
         answer: ['56', '47', '46'],
         rightAnswer: 2,
-        score: false,
-        answered: false,
+        isTrue: false,
+        isAnswered: false,
       },
     ],
     idx: 0,
+    result: 0,
   };
 
   answerHandler = index => {
-    const idx = this.state.idx;
     const rightAnswer = this.state.questions[this.state.idx].rightAnswer;
+    const question = this.state.questions[this.state.idx];
+    const questions = [...this.state.questions];
+    let idx = this.state.idx;
+    let result = this.state.result;
 
     if (index === rightAnswer) {
-      const newState = [
-        update(this.state.questions, {
-          [idx]: {
-            answered: { $set: !this.state.questions[idx].answered },
-          },
-        }),
-      ];
-
-      this.setState({
-        newState,
-      });
+      question.isAnswered = true;
+      question.isTrue = true;
+      result++;
+      questions[index] = question;
+      this.setState({ questions, result });
       console.log(this.state);
+      console.log(this.state.questions.length);
     } else {
-      console.log('score');
+      question.isAnswered = true;
+      questions[index] = question;
+      this.setState({ questions });
+      console.log(this.state);
+    }
+
+    if (idx < questions.length) {
+      idx++;
+      this.setState({ idx });
     }
   };
+
   onClickHandler = index => {
     this.setState({ idx: index });
   };
+
   render() {
     return (
       <div className="app">
-        <Title />
-        <div className="wrapper">
-          <Question question={this.state.questions[this.state.idx].question} />
-          {this.state.questions[this.state.idx].answer.map((i, index) => {
-            return (
-              <Answer
-                key={index}
-                answer={[i]}
-                answerHandler={this.answerHandler.bind(this, index)}
+        {this.state.idx === this.state.questions.length ? (
+          <ShowResult result={this.state.result} />
+        ) : null}
+        {this.state.idx < this.state.questions.length ? (
+          <div>
+            <Title />
+            <div className="wrapper">
+              <Question
+                question={this.state.questions[this.state.idx].question}
               />
-            );
-          })}
-        </div>
-        <div className="pages">
-          {this.state.questions.map((i, index) => {
-            return (
-              <Navigation
-                key={index}
-                onClick={this.onClickHandler.bind(this, index)}
-                page={index + 1}
-              />
-            );
-          })}
-        </div>
+              {this.state.questions[this.state.idx].answer.map((i, index) => {
+                return (
+                  <Answer
+                    key={index}
+                    answer={[i]}
+                    answerHandler={this.answerHandler.bind(this, index)}
+                  />
+                );
+              })}
+            </div>
+            <div className="pages">
+              {this.state.questions.map((i, index) => {
+                return (
+                  <Navigation
+                    key={index}
+                    onClick={this.onClickHandler.bind(this, index)}
+                    page={index + 1}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
       </div>
     );
   }
